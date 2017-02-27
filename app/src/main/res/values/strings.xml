@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">NewsReader</string>
+    <string name="error_message">Network error, please try again later.</string>
+    <string name="error_button">TRY AGAIN</string>
+    <string name="menu_request_update">UPDATE</string>
+
+    <string name="place_holder">STRING_PLACE_HOLDER</string>
+</resources>
