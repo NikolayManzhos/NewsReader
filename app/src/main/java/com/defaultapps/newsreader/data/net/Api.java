@@ -12,4 +12,11 @@ public interface Api {
     @GET("sources")
     Call<SourcesResponse> getSources(
             @Query("language") String languageCode);
+
+    @GET("articles")
+    Call<ArticlesResponse> getArticles(
+            @Query("source") String source,
+            @Query("sortBy") String sortBy,
+            @Query("apiKey") String apiKey
+    );
 }

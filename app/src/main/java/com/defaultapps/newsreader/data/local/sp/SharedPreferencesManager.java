@@ -10,7 +10,8 @@ public class SharedPreferencesManager {
     private SharedPreferencesHelper sharedPreferencesHelper;
 
     private final String CACHE_TIME = "cache_exp_time";
-    private final String LANGUAGE_CODE = "language_code";
+    private final String SOURCE_CODE = "source_code";
+    private final String SORT_ORDER = "sort_order";
 
     @Inject
     public SharedPreferencesManager(SharedPreferencesHelper sharedPreferencesHelper) {
@@ -25,12 +26,20 @@ public class SharedPreferencesManager {
         sharedPreferencesHelper.putLong(CACHE_TIME, currentTime);
     }
 
-    public String getLanguageCode() {
-        return sharedPreferencesHelper.getString(LANGUAGE_CODE);
+    public String getSource() {
+        return sharedPreferencesHelper.getString(SOURCE_CODE);
     }
 
-    public void setLanguageCode(String languageCode) {
-        sharedPreferencesHelper.putString(LANGUAGE_CODE, languageCode);
+    public void setSource(String sourceCode) {
+        sharedPreferencesHelper.putString(SOURCE_CODE, sourceCode);
+    }
+
+    public String getSort() {
+        return sharedPreferencesHelper.getString(SORT_ORDER);
+    }
+
+    public void setSort(String sortOrder) {
+        sharedPreferencesHelper.putString(SORT_ORDER, sortOrder);
     }
 
 

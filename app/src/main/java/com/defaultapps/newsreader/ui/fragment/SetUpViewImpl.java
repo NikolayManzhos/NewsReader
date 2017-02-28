@@ -9,9 +9,6 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -25,6 +22,8 @@ import com.defaultapps.newsreader.ui.adapter.SourcesAdapter;
 import com.defaultapps.newsreader.ui.presenter.SetUpViewPresenterImpl;
 import com.squareup.leakcanary.RefWatcher;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -33,13 +32,15 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.Unbinder;
+import icepick.Icepick;
+import icepick.State;
 import jp.wasabeef.recyclerview.adapters.ScaleInAnimationAdapter;
 
 
 public class SetUpViewImpl extends Fragment implements SetUpView{
 
     @Inject
-    SetUpViewPresenterImpl mainViewPresenter;
+    SetUpViewPresenterImpl setUpViewPresenter;
 
     @Inject
     SourcesAdapter sourcesAdapter;
@@ -63,10 +64,14 @@ public class SetUpViewImpl extends Fragment implements SetUpView{
 
     private final String TAG = "SetUpViewImpl";
 
+    @State
+    ArrayList<List<String>> data;
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         App.getAppComponent(getActivity()).inject(this);
+        Icepick.restoreInstanceState(this, savedInstanceState);
     }
 
     @Nullable
@@ -78,66 +83,52 @@ public class SetUpViewImpl extends Fragment implements SetUpView{
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         unbinder = ButterKnife.bind(this, view);
-        mainViewPresenter.setView(this);
+        setUpViewPresenter.setView(this);
         initRecyclerView();
-//        radioGroup.setOnClickListener(this);
+        if (data != null) {
+            updateView(data.get(0), data.get(1), data.get(2));
+            sourcesRecycler.setVisibility(View.VISIBLE);
+        }
         if (savedInstanceState != null) {
-            mainViewPresenter.restoreViewState();
+            setUpViewPresenter.restoreViewState();
         } else {
-//            mainViewPresenter.requestSourceUpdate();
+//            setUpViewPresenter.requestSourceUpdate();
         }
 
 
         super.onViewCreated(view, savedInstanceState);
     }
 
-//    @Override
-//    public void onClickListener(RadioGroup radioGroup, int i) {
-//        switch (radioGroup.getCheckedRadioButtonId()) {
-//            case R.id.setupEngRadio:
-//                Log.d(TAG, "ENGLISH");
-//                mainViewPresenter.requestSourceUpdate("en");
-//                break;
-//            case R.id.setupDeRadio:
-//                mainViewPresenter.requestSourceUpdate("de");
-//                break;
-//            case R.id.setupFrRadio:
-//                mainViewPresenter.requestSourceUpdate("fr");
-//                break;
-//        }
-//    }
-
-    @OnClick({R.id.setupEngRadio, R.id.setupDeRadio, R.id.setupFrRadio})
-    void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.setupEngRadio:
-                Log.d(TAG, "ENGLISH");
-                mainViewPresenter.requestSourceUpdate("en");
-                break;
-            case R.id.setupDeRadio:
-                mainViewPresenter.requestSourceUpdate("de");
-                break;
-            case R.id.setupFrRadio:
-                mainViewPresenter.requestSourceUpdate("fr");
-                break;
-        }
-    }
-
-
-
-    @OnClick(R.id.errorButton)
-    void onClick() {
-//        mainViewPresenter.requestSourceUpdate();
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        Icepick.saveInstanceState(this, outState);
+        super.onSaveInstanceState(outState);
     }
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
         sourcesRecycler.setAdapter(null);
-        mainViewPresenter.detachView();
+        setUpViewPresenter.detachView();
         unbinder.unbind();
         RefWatcher refWatcher = App.getRefWatcher(getActivity());
         refWatcher.watch(this);
+    }
+
+    @OnClick({R.id.setupEngRadio, R.id.setupDeRadio, R.id.setupFrRadio})
+    void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.setupEngRadio:
+                Log.d(TAG, "ENGLISH");
+                setUpViewPresenter.requestSourceUpdate("en");
+                break;
+            case R.id.setupDeRadio:
+                setUpViewPresenter.requestSourceUpdate("de");
+                break;
+            case R.id.setupFrRadio:
+                setUpViewPresenter.requestSourceUpdate("fr");
+                break;
+        }
     }
 
     @Override
@@ -164,6 +155,10 @@ public class SetUpViewImpl extends Fragment implements SetUpView{
 
     @Override
     public void updateView(List<String> sourcesName, List<String> sourcesDescription, List<String> sourcesUrl) {
+        data = new ArrayList<>();
+        data.add(sourcesName);
+        data.add(sourcesDescription);
+        data.add(sourcesUrl);
         sourcesAdapter.setSourcesData(sourcesName, sourcesDescription, sourcesUrl);
     }
 

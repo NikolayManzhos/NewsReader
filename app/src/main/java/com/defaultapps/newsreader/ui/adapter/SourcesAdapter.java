@@ -59,7 +59,7 @@ public class SourcesAdapter extends RecyclerView.Adapter<SourcesAdapter.PhotosVi
 
     @Override
     public SourcesAdapter.PhotosViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(context).inflate(R.layout.item_photo, parent, false);
+        View view = LayoutInflater.from(context).inflate(R.layout.item_source, parent, false);
         return new PhotosViewHolder(view);
     }
 

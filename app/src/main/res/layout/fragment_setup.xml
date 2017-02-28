@@ -33,6 +33,7 @@
             android:id="@+id/sourcesRecyclerView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:visibility="gone"
             android:scrollbars="vertical"/>
 
         <include layout="@layout/progress_view" />

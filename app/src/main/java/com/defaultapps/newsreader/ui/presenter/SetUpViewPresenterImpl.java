@@ -6,22 +6,19 @@ import android.util.Log;
 import com.defaultapps.newsreader.data.interactor.SetUpViewInteractor;
 import com.defaultapps.newsreader.ui.fragment.SetUpViewImpl;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
 @Singleton
-public class SetUpViewPresenterImpl implements SetUpViewPresenter, SetUpViewInteractor.MainViewInteractorCallback {
+public class SetUpViewPresenterImpl implements SetUpViewPresenter, SetUpViewInteractor.SetUpInteractorCallback {
 
     private SetUpViewImpl view;
     private SetUpViewInteractor setUpViewInteractor;
 
     private boolean taskRunning = false;
     private boolean errorVisible = false;
-
-    private List<List<String>> savedData;
 
     @Inject
     public SetUpViewPresenterImpl(SetUpViewInteractor setUpViewInteractor) {
@@ -60,10 +57,6 @@ public class SetUpViewPresenterImpl implements SetUpViewPresenter, SetUpViewInte
 
     @Override
     public void onSuccess(List<String> sourcesName, List<String> sourcesDescription, List<String> sourcesUrl) {
-        savedData = new ArrayList<>();
-        savedData.add(sourcesName);
-        savedData.add(sourcesDescription);
-        savedData.add(sourcesUrl);
         if (view != null) {
             view.hideLoading();
             view.hideError();
@@ -94,9 +87,6 @@ public class SetUpViewPresenterImpl implements SetUpViewPresenter, SetUpViewInte
                 view.showError();
                 view.hideSourcesList();
                 view.hideLoading();
-            } else {
-                if (savedData != null)
-                view.updateView(savedData.get(0), savedData.get(1), savedData.get(2));
             }
         }
     }

@@ -1,7 +1,6 @@
 package com.defaultapps.newsreader.data.interactor;
 
 
-import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.util.Log;
 
@@ -26,7 +25,7 @@ public class SetUpViewInteractor {
     private NetworkService networkService;
     private LocalService localService;
     private SharedPreferencesManager sharedPreferencesManager;
-    private MainViewInteractorCallback callback;
+    private SetUpInteractorCallback callback;
     private boolean responseStatus;
 
     private SourcesResponse data;
@@ -35,7 +34,7 @@ public class SetUpViewInteractor {
     private List<String> sourcesDescription;
 
 
-    public interface MainViewInteractorCallback {
+    public interface SetUpInteractorCallback {
         void onSuccess(List<String> sourcesName, List<String> sourcesDescription, List<String> sourcesUrl);
         void onFailure();
     }
@@ -48,7 +47,7 @@ public class SetUpViewInteractor {
         this.sharedPreferencesManager = sharedPreferencesManager;
     }
 
-    public void bindInteractor(MainViewInteractorCallback callback) {
+    public void bindInteractor(SetUpInteractorCallback callback) {
         this.callback = callback;
     }
 
@@ -63,7 +62,6 @@ public class SetUpViewInteractor {
 //                      localService.writeResponseToFile(data);
                     if (response.isSuccessful()) {
                         parseData(data);
-                        sharedPreferencesManager.setLanguageCode(languageCode);
                         responseStatus = true;
                     } else {
                         responseStatus = false;

@@ -4,5 +4,5 @@
     <item
         android:title="@string/menu_request_update"
         android:id="@+id/updateData"
-        app:showAsAction="ifRoom"/>
+        app:showAsAction="collapseActionView"/>
 </menu>
