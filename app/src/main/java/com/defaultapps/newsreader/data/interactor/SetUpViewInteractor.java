@@ -32,10 +32,16 @@ public class SetUpViewInteractor {
     private List<String> sourcesName;
     private List<String> sourcesUrl;
     private List<String> sourcesDescription;
+    private List<String> sourcesId;
+    private List<List<String>> sourcesSortAvailable;
 
 
     public interface SetUpInteractorCallback {
-        void onSuccess(List<String> sourcesName, List<String> sourcesDescription, List<String> sourcesUrl);
+        void onSuccess(List<String> sourcesName,
+                       List<String> sourcesDescription,
+                       List<String> sourcesUrl,
+                       List<String> sourcesId,
+                       List<List<String>> sourcesSortAvailable);
         void onFailure();
     }
 
@@ -80,7 +86,11 @@ public class SetUpViewInteractor {
                 if (callback != null) {
                     if (responseStatus) {
                         Log.d("AsyncTaskNet", "SUCCESS");
-                        callback.onSuccess(sourcesName, sourcesDescription, sourcesUrl);
+                        callback.onSuccess(sourcesName,
+                                sourcesDescription,
+                                sourcesUrl,
+                                sourcesId,
+                                sourcesSortAvailable);
                         sourcesUrl = null;
                         sourcesDescription = null;
                     } else {
@@ -93,56 +103,19 @@ public class SetUpViewInteractor {
         downloadFromNetTask.execute();
     }
 
-//    public void loadDataFromCache() {
-//        loadFromCacheTask = new AsyncTask<Void, Void, Void>() {
-//            @Override
-//            protected void onPreExecute() {
-//                super.onPreExecute();
-//            }
-//
-//            @Override
-//            protected Void doInBackground(Void... params) {
-//                try {
-//                    data = localService.readResponseFromFile();
-//                    parseData(data);
-//                    responseStatus = true;
-//                } catch (IOException ex) {
-//                    ex.printStackTrace();
-//                    Log.d("AsyncTaskLocal", "FAILED TO READ DATA");
-//                    responseStatus = false;
-//                }
-//                return null;
-//            }
-//
-//            @Override
-//            protected void onPostExecute(Void aVoid) {
-//                super.onPostExecute(aVoid);
-//                if (callback != null) {
-//                    if (responseStatus) {
-//                        Log.d("AsyncTaskLocal", "SUCCESS");
-//                        callback.onSuccess(photosUrl, photosTitle);
-//                        photosUrl = null;
-//                        photosTitle = null;
-//                    } else {
-//                        Log.d("AsyncTaskLocal", "FAILURE");
-//                        callback.onFailure();
-//                    }
-//                }
-//            }
-//        };
-//        if (!loadFromCacheTask.getStatus().equals(AsyncTask.Status.RUNNING)) {
-//            loadFromCacheTask.execute();
-//        }
-//    }
 
     private void parseData(SourcesResponse dataToParse) {
         sourcesName = new ArrayList<>();
         sourcesUrl = new ArrayList<>();
         sourcesDescription = new ArrayList<>();
+        sourcesId = new ArrayList<>();
+        sourcesSortAvailable = new ArrayList<>();
         for (Source source : dataToParse.getSources() ) {
             sourcesName.add(source.getName());
             sourcesUrl.add(source.getUrlsToLogos().getMedium());
             sourcesDescription.add(source.getDescription());
+            sourcesId.add(source.getId());
+            sourcesSortAvailable.add(source.getSortBysAvailable());
         }
     }
 }

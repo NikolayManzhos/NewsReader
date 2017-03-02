@@ -4,12 +4,15 @@ import android.content.Context;
 import android.os.AsyncTask;
 
 import com.defaultapps.newsreader.R;
+import com.defaultapps.newsreader.data.entity.articles.Article;
 import com.defaultapps.newsreader.data.entity.articles.ArticlesResponse;
 import com.defaultapps.newsreader.data.local.LocalService;
 import com.defaultapps.newsreader.data.local.sp.SharedPreferencesManager;
 import com.defaultapps.newsreader.data.net.NetworkService;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.inject.Inject;
 
@@ -24,11 +27,13 @@ public class MainViewInteractor {
     private MainViewInteractorCallback callback;
     private boolean responseStatus = false;
 
+    private List<String> articlesTitle, articlesImageUrl, articlesDescription;
+
     private AsyncTask<Void, Void, Void> downloadArticlesTask;
 
 
     public interface MainViewInteractorCallback {
-        void onSuccess();
+        void onSuccess(List<String> articlesTitle, List<String> articlesDescription, List<String> articlesImageUrl);
         void onFailure();
     }
 
@@ -56,7 +61,12 @@ public class MainViewInteractor {
                             .getNetworkCall()
                             .getArticles(sharedPreferencesManager.getSource(), sharedPreferencesManager.getSort(), context.getString(R.string.NEWS_API_KEY))
                             .execute();
-                    responseStatus = true;
+                    if (response.isSuccessful()) {
+                        parseData(response.body());
+                        responseStatus = true;
+                    } else {
+                        responseStatus = false;
+                    }
                 } catch (IOException ex) {
                     ex.printStackTrace();
                     responseStatus = false;
@@ -68,7 +78,7 @@ public class MainViewInteractor {
             protected void onPostExecute(Void aVoid) {
                 if (callback != null) {
                     if (responseStatus) {
-                        callback.onSuccess();
+                        callback.onSuccess(articlesTitle, articlesDescription, articlesImageUrl);
                     } else {
                         callback.onFailure();
                     }
@@ -76,5 +86,18 @@ public class MainViewInteractor {
                 super.onPostExecute(aVoid);
             }
         }.execute();
+    }
+
+    //TODO: cache
+
+    private void parseData(ArticlesResponse articles) {
+        articlesTitle = new ArrayList<>();
+        articlesDescription = new ArrayList<>();
+        articlesImageUrl = new ArrayList<>();
+        for (Article article : articles.getArticles()) {
+            articlesTitle.add(article.getTitle());
+            articlesDescription.add(article.getDescription());
+            articlesImageUrl.add(article.getUrlToImage());
+        }
     }
 }

@@ -56,12 +56,12 @@ public class SetUpViewPresenterImpl implements SetUpViewPresenter, SetUpViewInte
 
 
     @Override
-    public void onSuccess(List<String> sourcesName, List<String> sourcesDescription, List<String> sourcesUrl) {
+    public void onSuccess(List<String> sourcesName, List<String> sourcesDescription, List<String> sourcesUrl, List<String> sourcesId, List<List<String>> sourcesSortAvailable) {
         if (view != null) {
             view.hideLoading();
             view.hideError();
             view.showSourcesList();
-            view.updateView(sourcesName, sourcesDescription, sourcesUrl);
+            view.updateView(sourcesName, sourcesDescription, sourcesUrl, sourcesId, sourcesSortAvailable);
         }
         setTaskStatus(false);
     }

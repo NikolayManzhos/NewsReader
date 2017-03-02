@@ -1,8 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
+
     <item
-        android:title="@string/menu_request_update"
+        android:title="Settings"
+        android:id="@+id/settings"
+        app:showAsAction="always" />
+
+    <item
+        android:title="Sort By Top"
         android:id="@+id/updateData"
-        app:showAsAction="collapseActionView"/>
+        app:showAsAction="collapseActionView" />
+    <item
+        android:title="Sort By Latest"
+        android:id="@+id/sortLatest"
+        app:showAsAction="collapseActionView" />
+    <item
+        android:title="Sort By Popular"
+        android:id="@+id/sortPopular"
+        app:showAsAction="collapseActionView" />
 </menu>

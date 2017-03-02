@@ -20,21 +20,19 @@ import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.OnClick;
 
-public class SourcesAdapter extends RecyclerView.Adapter<SourcesAdapter.PhotosViewHolder>  {
+public class SourcesAdapter extends RecyclerView.Adapter<SourcesAdapter.PhotosViewHolder> {
 
     private ArrayList<String> sourcesName;
     private ArrayList<String> sourcesDescription;
     private ArrayList<String> sourcesUrl;
     private Context context;
 
-    private OnClickListener onClickListener;
+    private  Listener listener;
 
     @Inject
     public SourcesAdapter(Context context) {
         this.context = context;
-//        this.data.addAll(data);
     }
 
 
@@ -64,7 +62,7 @@ public class SourcesAdapter extends RecyclerView.Adapter<SourcesAdapter.PhotosVi
     }
 
     @Override
-    public void onBindViewHolder(SourcesAdapter.PhotosViewHolder holder, int position) {
+    public void onBindViewHolder(final SourcesAdapter.PhotosViewHolder holder, int position) {
         if (sourcesName != null && sourcesDescription != null && sourcesUrl != null) {
             holder.sourceNameTextView.setText(sourcesName.get(holder.getAdapterPosition()));
             holder.sourceDescriptionTextView.setText(sourcesDescription.get(holder.getAdapterPosition()));
@@ -73,17 +71,18 @@ public class SourcesAdapter extends RecyclerView.Adapter<SourcesAdapter.PhotosVi
                     .load(sourcesUrl.get(holder.getAdapterPosition()))
                     .diskCacheStrategy(DiskCacheStrategy.RESULT)
                     .into(holder.sourceImage);
+            holder.sourceItem.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    listener.onSourceClick(holder.getAdapterPosition());
+                }
+            });
         }
     }
 
     @Override
     public int getItemCount() {
         return sourcesUrl != null ? sourcesUrl.size() : 0;
-    }
-
-    @OnClick(R.id.sourceItem)
-    void onClick() {
-        onClickListener.onClick();
     }
 
 
@@ -94,11 +93,11 @@ public class SourcesAdapter extends RecyclerView.Adapter<SourcesAdapter.PhotosVi
         notifyDataSetChanged();
     }
 
-    public void setOnClickListener(OnClickListener onClickListener) {
-        this.onClickListener = onClickListener;
+    public void setListener(Listener listener) {
+        this.listener = listener;
     }
 
-    public interface OnClickListener {
-        void onClick();
+    public interface Listener {
+        void onSourceClick(int position);
     }
 }

@@ -11,9 +11,10 @@ import com.defaultapps.newsreader.data.local.sp.SharedPreferencesManager;
 import com.defaultapps.newsreader.ui.fragment.MainViewImpl;
 import com.defaultapps.newsreader.ui.fragment.SetUpViewImpl;
 
+
 import javax.inject.Inject;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements SetUpViewImpl.SourcesListener {
     
     @Inject
     Application application;
@@ -27,11 +28,13 @@ public class MainActivity extends AppCompatActivity {
         App.getAppComponent(this).inject(this);
         setContentView(R.layout.activity_main);
         if (savedInstanceState == null) {
-            getSupportFragmentManager()
-                    .beginTransaction()
-                    .replace(R.id.contentFrame, new SetUpViewImpl())
-                    .commit();
+            if (sharedPreferencesManager.getSource() == null) {
+                replaceFragment(new SetUpViewImpl());
+            } else {
+                replaceFragment(new MainViewImpl());
+            }
         }
+
     }
 
     private void replaceFragment(Fragment fragment) {
@@ -39,5 +42,11 @@ public class MainActivity extends AppCompatActivity {
                 .beginTransaction()
                 .replace(R.id.contentFrame, fragment)
                 .commit();
+    }
+
+    @Override
+    public void sourceClicked() {
+        MainViewImpl mainFragment = new MainViewImpl();
+        replaceFragment(mainFragment);
     }
 }

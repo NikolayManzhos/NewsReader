@@ -6,7 +6,11 @@ import java.util.List;
 
 
 public interface SetUpView extends MvpView {
-    void updateView(List<String> sourcesName, List<String> sourcesDescription, List<String> sourcesUrl);
+    void updateView(List<String> sourcesName,
+                    List<String> sourcesDescription,
+                    List<String> sourcesUrl,
+                    List<String> sourcesId,
+                    List<List<String>> sourcesSortAvailable);
     void hideSourcesList();
     void showSourcesList();
 }

@@ -1,5 +1,6 @@
 package com.defaultapps.newsreader.ui.fragment;
 
+import android.content.Context;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -7,7 +8,6 @@ import android.support.v4.app.Fragment;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,15 +15,16 @@ import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.RadioGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.defaultapps.newsreader.App;
 import com.defaultapps.newsreader.R;
+import com.defaultapps.newsreader.data.local.sp.SharedPreferencesManager;
 import com.defaultapps.newsreader.ui.adapter.SourcesAdapter;
 import com.defaultapps.newsreader.ui.presenter.SetUpViewPresenterImpl;
 import com.squareup.leakcanary.RefWatcher;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -37,7 +38,7 @@ import icepick.State;
 import jp.wasabeef.recyclerview.adapters.ScaleInAnimationAdapter;
 
 
-public class SetUpViewImpl extends Fragment implements SetUpView{
+public class SetUpViewImpl extends Fragment implements SetUpView, SourcesAdapter.Listener{
 
     @Inject
     SetUpViewPresenterImpl setUpViewPresenter;
@@ -45,7 +46,11 @@ public class SetUpViewImpl extends Fragment implements SetUpView{
     @Inject
     SourcesAdapter sourcesAdapter;
 
+    @Inject
+    SharedPreferencesManager sharedPreferencesManager;
+
     private Unbinder unbinder;
+    private SourcesListener sourcesListener;
 
     @BindView(R.id.errorTextView)
     TextView errorText;
@@ -67,6 +72,22 @@ public class SetUpViewImpl extends Fragment implements SetUpView{
     @State
     ArrayList<List<String>> data;
 
+    @State
+    ArrayList<List<String>> sortsAvailable;
+
+    public interface SourcesListener {
+        void sourceClicked();
+    }
+
+
+    @Override
+    public void onAttach(Context context) {
+        if (context instanceof SourcesListener) {
+            sourcesListener = (SourcesListener) context;
+        }
+        super.onAttach(context);
+    }
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -86,16 +107,13 @@ public class SetUpViewImpl extends Fragment implements SetUpView{
         setUpViewPresenter.setView(this);
         initRecyclerView();
         if (data != null) {
-            updateView(data.get(0), data.get(1), data.get(2));
+            sourcesAdapter.setSourcesData(data.get(0), data.get(1), data.get(2));
             sourcesRecycler.setVisibility(View.VISIBLE);
         }
         if (savedInstanceState != null) {
             setUpViewPresenter.restoreViewState();
-        } else {
-//            setUpViewPresenter.requestSourceUpdate();
         }
-
-
+        sourcesAdapter.setListener(this);
         super.onViewCreated(view, savedInstanceState);
     }
 
@@ -119,7 +137,6 @@ public class SetUpViewImpl extends Fragment implements SetUpView{
     void onClick(View v) {
         switch (v.getId()) {
             case R.id.setupEngRadio:
-                Log.d(TAG, "ENGLISH");
                 setUpViewPresenter.requestSourceUpdate("en");
                 break;
             case R.id.setupDeRadio:
@@ -129,6 +146,14 @@ public class SetUpViewImpl extends Fragment implements SetUpView{
                 setUpViewPresenter.requestSourceUpdate("fr");
                 break;
         }
+    }
+
+    @Override
+    public void onSourceClick(int position) {
+        Toast.makeText(getActivity(), "Position " + String.valueOf(position), Toast.LENGTH_SHORT).show();
+        sharedPreferencesManager.setSource(data.get(3).get(position));
+        sharedPreferencesManager.setSort("top");
+        sourcesListener.sourceClicked();
     }
 
     @Override
@@ -154,11 +179,18 @@ public class SetUpViewImpl extends Fragment implements SetUpView{
     }
 
     @Override
-    public void updateView(List<String> sourcesName, List<String> sourcesDescription, List<String> sourcesUrl) {
+    public void updateView(List<String> sourcesName,
+                           List<String> sourcesDescription,
+                           List<String> sourcesUrl,
+                           List<String> sourcesId,
+                           List<List<String>> sourceSortAvailable) {
         data = new ArrayList<>();
+        sortsAvailable = new ArrayList<>();
         data.add(sourcesName);
         data.add(sourcesDescription);
         data.add(sourcesUrl);
+        data.add(sourcesId);
+        sortsAvailable.addAll(sourceSortAvailable);
         sourcesAdapter.setSourcesData(sourcesName, sourcesDescription, sourcesUrl);
     }
 

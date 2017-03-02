@@ -1,11 +1,14 @@
 package com.defaultapps.newsreader.ui.fragment;
 
-/**
- * Created on 2/26/2017.
- */
+import com.defaultapps.newsreader.ui.base.MvpView;
 
-public interface MainView {
-    void showTopicList();
-    void hideTopicList();
-    void updateView(); //TODO: Pass data in this method.
+import java.util.List;
+
+
+public interface MainView extends MvpView {
+    void showArticlesList();
+    void hideArticlesList();
+    void updateView(List<String> articlesTitle,
+                    List<String> articlesDescription,
+                    List<String> articlesImageUrl);
 }
