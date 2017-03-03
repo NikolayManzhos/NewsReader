@@ -126,8 +126,8 @@ public class SetUpViewImpl extends Fragment implements SetUpView, SourcesAdapter
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        sourcesRecycler.setAdapter(null);
         setUpViewPresenter.detachView();
+        sourcesRecycler.setAdapter(null);
         unbinder.unbind();
         RefWatcher refWatcher = App.getRefWatcher(getActivity());
         refWatcher.watch(this);

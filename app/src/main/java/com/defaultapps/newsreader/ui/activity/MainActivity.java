@@ -1,7 +1,10 @@
 package com.defaultapps.newsreader.ui.activity;
 
 import android.app.Application;
+import android.content.Intent;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
@@ -14,7 +17,7 @@ import com.defaultapps.newsreader.ui.fragment.SetUpViewImpl;
 
 import javax.inject.Inject;
 
-public class MainActivity extends AppCompatActivity implements SetUpViewImpl.SourcesListener {
+public class MainActivity extends AppCompatActivity implements SetUpViewImpl.SourcesListener, MainViewImpl.MainViewListener {
     
     @Inject
     Application application;
@@ -37,16 +40,51 @@ public class MainActivity extends AppCompatActivity implements SetUpViewImpl.Sou
 
     }
 
-    private void replaceFragment(Fragment fragment) {
-        getSupportFragmentManager()
-                .beginTransaction()
-                .replace(R.id.contentFrame, fragment)
-                .commit();
-    }
-
     @Override
     public void sourceClicked() {
         MainViewImpl mainFragment = new MainViewImpl();
+        removeFromBackStack(SetUpViewImpl.class.getName());
+        sharedPreferencesManager.setForceLoadStatus(true);
         replaceFragment(mainFragment);
+    }
+
+    @Override
+    public void settingsClicked() {
+        replaceFragment(new SetUpViewImpl());
+    }
+
+    @Override
+    public void openWebView(String url) {
+        Intent intent = new Intent(this, WebViewActivity.class);
+        intent.putExtra("URL", url);
+        startActivity(intent);
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (getSupportFragmentManager().getBackStackEntryCount() == 1){
+            finish();
+        } else {
+            super.onBackPressed();
+        }
+    }
+
+    private void replaceFragment (Fragment fragment){
+        String backStateName =  fragment.getClass().getName();
+
+        FragmentManager manager = getSupportFragmentManager();
+        boolean fragmentPopped = manager.popBackStackImmediate (backStateName, 0);
+
+        if (!fragmentPopped && manager.findFragmentByTag(backStateName) == null) {
+            FragmentTransaction ft = manager.beginTransaction();
+            ft.replace(R.id.contentFrame, fragment, backStateName);
+            ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
+            ft.addToBackStack(backStateName);
+            ft.commit();
+        }
+    }
+
+    private void removeFromBackStack(String fragmentName) {
+        getSupportFragmentManager().popBackStack(fragmentName, FragmentManager.POP_BACK_STACK_INCLUSIVE);
     }
 }

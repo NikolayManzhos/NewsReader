@@ -2,6 +2,7 @@ package com.defaultapps.newsreader.data.interactor;
 
 import android.content.Context;
 import android.os.AsyncTask;
+import android.util.Log;
 
 import com.defaultapps.newsreader.R;
 import com.defaultapps.newsreader.data.entity.articles.Article;
@@ -27,13 +28,16 @@ public class MainViewInteractor {
     private MainViewInteractorCallback callback;
     private boolean responseStatus = false;
 
-    private List<String> articlesTitle, articlesImageUrl, articlesDescription;
+    private List<String> articlesTitle, articlesImageUrl, articlesDescription, articlesDirectUrl;
 
     private AsyncTask<Void, Void, Void> downloadArticlesTask;
+    private AsyncTask<Void, Void, Void> loadFromCacheTask;
+
+    private final long CACHE_EXP_TIME = 86400000;
 
 
     public interface MainViewInteractorCallback {
-        void onSuccess(List<String> articlesTitle, List<String> articlesDescription, List<String> articlesImageUrl);
+        void onSuccess(List<String> articlesTitle, List<String> articlesDescription, List<String> articlesImageUrl, List<String> articlesDirectUrl);
         void onFailure();
     }
 
@@ -52,7 +56,7 @@ public class MainViewInteractor {
         this.callback = mainViewInteractorCallback;
     }
 
-    public void loadArtcilesData() {
+    public void loadArticlesData() {
         downloadArticlesTask = new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... voids) {
@@ -63,6 +67,8 @@ public class MainViewInteractor {
                             .execute();
                     if (response.isSuccessful()) {
                         parseData(response.body());
+                        sharedPreferencesManager.setCacheTime(System.currentTimeMillis());
+                        localService.writeResponseToFile(response.body());
                         responseStatus = true;
                     } else {
                         responseStatus = false;
@@ -78,7 +84,7 @@ public class MainViewInteractor {
             protected void onPostExecute(Void aVoid) {
                 if (callback != null) {
                     if (responseStatus) {
-                        callback.onSuccess(articlesTitle, articlesDescription, articlesImageUrl);
+                        callback.onSuccess(articlesTitle, articlesDescription, articlesImageUrl, articlesDirectUrl);
                     } else {
                         callback.onFailure();
                     }
@@ -88,16 +94,57 @@ public class MainViewInteractor {
         }.execute();
     }
 
-    //TODO: cache
+    public void loadDataFromCache() {
+        if (localService.isCacheAvailable()
+                && sharedPreferencesManager.getCacheTime() != 0
+                && (System.currentTimeMillis() - sharedPreferencesManager.getCacheTime()) < CACHE_EXP_TIME ) {
+            loadFromCacheTask = new AsyncTask<Void, Void, Void>() {
+                @Override
+                protected Void doInBackground(Void... params) {
+                    try {
+                        ArticlesResponse data = localService.readResponseFromFile();
+                        parseData(data);
+                        responseStatus = true;
+                    } catch (IOException ex) {
+                        ex.printStackTrace();
+                        Log.d("AsyncTaskLocal", "FAILED TO READ DATA");
+                        responseStatus = false;
+                    }
+                    return null;
+                }
+
+                @Override
+                protected void onPostExecute(Void aVoid) {
+                    super.onPostExecute(aVoid);
+                    if (callback != null) {
+                        if (responseStatus) {
+                            Log.d("AsyncTaskLocal", "SUCCESS");
+                            callback.onSuccess(articlesTitle, articlesDescription, articlesImageUrl, articlesDirectUrl);
+                        } else {
+                            Log.d("AsyncTaskLocal", "FAILURE");
+                            callback.onFailure();
+                        }
+                    }
+                }
+            };
+            loadFromCacheTask.execute();
+
+        } else {
+            localService.deleteCache();
+            loadArticlesData();
+        }
+    }
 
     private void parseData(ArticlesResponse articles) {
         articlesTitle = new ArrayList<>();
         articlesDescription = new ArrayList<>();
         articlesImageUrl = new ArrayList<>();
+        articlesDirectUrl = new ArrayList<>();
         for (Article article : articles.getArticles()) {
             articlesTitle.add(article.getTitle());
             articlesDescription.add(article.getDescription());
             articlesImageUrl.add(article.getUrlToImage());
+            articlesDirectUrl.add(article.getUrl());
         }
     }
 }

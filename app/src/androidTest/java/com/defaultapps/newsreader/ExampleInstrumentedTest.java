@@ -22,7 +22,7 @@ import static android.support.test.espresso.matcher.ViewMatchers.withId;
 public class ExampleInstrumentedTest {
 
     @Rule
-    public ActivityTestRule<MainActivity> mNotesActivityTestRule =
+    public ActivityTestRule<MainActivity> mainActivityTestRule =
             new ActivityTestRule<>(MainActivity.class);
 
     @Test

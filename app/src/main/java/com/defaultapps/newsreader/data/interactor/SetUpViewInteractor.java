@@ -6,8 +6,7 @@ import android.util.Log;
 
 import com.defaultapps.newsreader.data.entity.sources.Source;
 import com.defaultapps.newsreader.data.entity.sources.SourcesResponse;
-import com.defaultapps.newsreader.data.local.LocalService;
-import com.defaultapps.newsreader.data.local.sp.SharedPreferencesManager;
+
 import com.defaultapps.newsreader.data.net.NetworkService;
 
 import java.io.IOException;
@@ -21,10 +20,7 @@ import retrofit2.Response;
 public class SetUpViewInteractor {
 
     private AsyncTask<Void, Void, Void> downloadFromNetTask;
-    private AsyncTask<Void, Void, Void> loadFromCacheTask;
     private NetworkService networkService;
-    private LocalService localService;
-    private SharedPreferencesManager sharedPreferencesManager;
     private SetUpInteractorCallback callback;
     private boolean responseStatus;
 
@@ -35,7 +31,6 @@ public class SetUpViewInteractor {
     private List<String> sourcesId;
     private List<List<String>> sourcesSortAvailable;
 
-
     public interface SetUpInteractorCallback {
         void onSuccess(List<String> sourcesName,
                        List<String> sourcesDescription,
@@ -45,12 +40,9 @@ public class SetUpViewInteractor {
         void onFailure();
     }
 
-
     @Inject
-    public SetUpViewInteractor(NetworkService networkService, LocalService localService, SharedPreferencesManager sharedPreferencesManager) {
+    public SetUpViewInteractor(NetworkService networkService) {
         this.networkService = networkService;
-        this.localService = localService;
-        this.sharedPreferencesManager = sharedPreferencesManager;
     }
 
     public void bindInteractor(SetUpInteractorCallback callback) {
@@ -65,7 +57,6 @@ public class SetUpViewInteractor {
                 try {
                     Response<SourcesResponse> response = networkService.getNetworkCall().getSources(languageCode).execute();
                     data = response.body();
-//                      localService.writeResponseToFile(data);
                     if (response.isSuccessful()) {
                         parseData(data);
                         responseStatus = true;
@@ -74,7 +65,6 @@ public class SetUpViewInteractor {
                     }
                 } catch (IOException ex) {
                     ex.printStackTrace();
-                    Log.d("AsyncTask", "FAILED TO WRITE DATA");
                     responseStatus = false;
                 }
                 return null;
@@ -85,16 +75,12 @@ public class SetUpViewInteractor {
                 super.onPostExecute(aVoid);
                 if (callback != null) {
                     if (responseStatus) {
-                        Log.d("AsyncTaskNet", "SUCCESS");
                         callback.onSuccess(sourcesName,
                                 sourcesDescription,
                                 sourcesUrl,
                                 sourcesId,
                                 sourcesSortAvailable);
-                        sourcesUrl = null;
-                        sourcesDescription = null;
                     } else {
-                        Log.d("AsyncTaskNet", "FAILURE");
                         callback.onFailure();
                     }
                 }
@@ -102,7 +88,6 @@ public class SetUpViewInteractor {
         };
         downloadFromNetTask.execute();
     }
-
 
     private void parseData(SourcesResponse dataToParse) {
         sourcesName = new ArrayList<>();

@@ -70,6 +70,7 @@ public class SourcesAdapter extends RecyclerView.Adapter<SourcesAdapter.PhotosVi
                     .with(context)
                     .load(sourcesUrl.get(holder.getAdapterPosition()))
                     .diskCacheStrategy(DiskCacheStrategy.RESULT)
+                    .fitCenter()
                     .into(holder.sourceImage);
             holder.sourceItem.setOnClickListener(new View.OnClickListener() {
                 @Override

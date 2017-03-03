@@ -29,7 +29,17 @@ public class MainViewPresenterImpl implements MainViewPresenter, MainViewInterac
         view.showLoading();
         view.hideError();
         view.hideArticlesList();
-        mainViewInteractor.loadArtcilesData();
+        mainViewInteractor.loadArticlesData();
+    }
+
+    @Override
+    public void requestCache() {
+        setTaskStatus(true);
+        setErrorVisibility(false);
+        view.showLoading();
+        view.hideError();
+        view.hideArticlesList();
+        mainViewInteractor.loadDataFromCache();
     }
 
     @Override
@@ -62,11 +72,11 @@ public class MainViewPresenterImpl implements MainViewPresenter, MainViewInterac
     }
 
     @Override
-    public void onSuccess(List<String> articlesTitle, List<String> articlesDescription, List<String> articlesImageUrl) {
+    public void onSuccess(List<String> articlesTitle, List<String> articlesDescription, List<String> articlesImageUrl, List<String> articlesDirectUrl) {
         if (view != null) {
             view.hideLoading();
             view.hideError();
-            view.updateView(articlesTitle, articlesDescription, articlesImageUrl);
+            view.updateView(articlesTitle, articlesDescription, articlesImageUrl, articlesDirectUrl);
             view.showArticlesList();
         }
         setTaskStatus(false);
@@ -84,7 +94,7 @@ public class MainViewPresenterImpl implements MainViewPresenter, MainViewInterac
                 view.hideArticlesList();
                 view.showError();
             } else {
-                //TODO: restore state from cache
+                mainViewInteractor.loadDataFromCache();
             }
         }
     }

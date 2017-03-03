@@ -26,7 +26,7 @@ public class SetUpViewPresenterUnitTest {
     private SetUpViewPresenterImpl mainViewPresenter;
 
     private List<String> data1;
-    private List<String> data2;
+    private List<List<String>> data2;
 
     @Mock
     SetUpViewInteractor setUpViewInteractor;
@@ -46,19 +46,13 @@ public class SetUpViewPresenterUnitTest {
     }
     @Test
     public void requestUpdateTest() throws Exception {
-        mainViewPresenter.requestUpdate();
+        mainViewPresenter.requestSourceUpdate("en");
 
         verify(mainView).showLoading();
         verify(mainView).hideSourcesList();
         verify(mainView).hideError();
     }
 
-    @Test
-    public void requestLocalDataTest() throws Exception {
-        mainViewPresenter.requestCachedData();
-
-        verify(mainView).showLoading();
-    }
 
     @Test
     public void onFailureTest() throws Exception {
@@ -71,12 +65,12 @@ public class SetUpViewPresenterUnitTest {
 
     @Test
     public void onSuccessTest() throws Exception {
-        mainViewPresenter.onSuccess(data1, data2);
+        mainViewPresenter.onSuccess(data1, data1, data1, data1, data2);
 
         verify(mainView).hideLoading();
         verify(mainView).hideError();
         verify(mainView).showSourcesList();
-        verify(mainView).updateView(data1, data2);
+        verify(mainView).updateView(data1, data1, data1, data1, data2);
     }
 
     @Test
@@ -88,7 +82,6 @@ public class SetUpViewPresenterUnitTest {
     /**
      * Testing config changes behavior.
      * In this test case data is still loading, so when config appears progressBar will be shown.
-     * @throws Exception
      */
     @Test
     public void restoreViewStateTestLoading() throws Exception {
@@ -104,7 +97,6 @@ public class SetUpViewPresenterUnitTest {
     /**
      * Testing config changes behavior.
      * In this test case data is failed to load and error screen displayed.
-     * @throws Exception
      */
     @Test
     public void restoreViewStateTestError() throws Exception {
@@ -127,7 +119,7 @@ public class SetUpViewPresenterUnitTest {
         mainViewPresenter.setErrorVisibilityStatus(false);
         mainViewPresenter.restoreViewState();
 
-        verify(mainView).showLoading();
+//        verify(mainView).showLoading();
     }
 
 

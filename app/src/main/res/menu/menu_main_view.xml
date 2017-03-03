@@ -8,15 +8,15 @@
         app:showAsAction="always" />
 
     <item
-        android:title="Sort By Top"
+        android:title="Top"
         android:id="@+id/updateData"
         app:showAsAction="collapseActionView" />
     <item
-        android:title="Sort By Latest"
+        android:title="Latest"
         android:id="@+id/sortLatest"
         app:showAsAction="collapseActionView" />
     <item
-        android:title="Sort By Popular"
+        android:title="Popular"
         android:id="@+id/sortPopular"
         app:showAsAction="collapseActionView" />
 </menu>

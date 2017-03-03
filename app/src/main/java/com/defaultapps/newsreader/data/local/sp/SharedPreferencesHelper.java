@@ -3,6 +3,8 @@ package com.defaultapps.newsreader.data.local.sp;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import java.util.Set;
+
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
@@ -52,5 +54,14 @@ public class SharedPreferencesHelper {
     public void putLong(String key, long value) {
         SharedPreferences.Editor e = sharedPreferences.edit();
         e.putLong(key, value).apply();
+    }
+
+    public Set<String> getStringSet(String key) {
+        return sharedPreferences.getStringSet(key, null);
+    }
+
+    public void putStringSet(String key, Set<String> value) {
+        SharedPreferences.Editor e = sharedPreferences.edit();
+        e.putStringSet(key, value).apply();
     }
 }

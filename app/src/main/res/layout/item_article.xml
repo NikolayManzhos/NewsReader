@@ -3,7 +3,9 @@
     android:id="@+id/articleItem"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:padding="10dp">
+    android:padding="10dp"
+    android:clickable="true"
+    android:background="?android:attr/selectableItemBackground">
 
     <ImageView
         android:id="@+id/articleImage"

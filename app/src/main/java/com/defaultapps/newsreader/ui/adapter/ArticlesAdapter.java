@@ -26,6 +26,11 @@ public class ArticlesAdapter extends RecyclerView.Adapter<ArticlesAdapter.Articl
 
     private Context context; //Application context
     private List<String> articlesTitle, articlesDescription, articlesImageUrl;
+    private ArticleListener articleListener;
+
+    public interface ArticleListener {
+        void onArticleClick(int position);
+    }
 
     static class ArticleViewHolder extends RecyclerView.ViewHolder {
 
@@ -59,7 +64,7 @@ public class ArticlesAdapter extends RecyclerView.Adapter<ArticlesAdapter.Articl
     }
 
     @Override
-    public void onBindViewHolder(ArticlesAdapter.ArticleViewHolder holder, int position) {
+    public void onBindViewHolder(final ArticlesAdapter.ArticleViewHolder holder, int position) {
         if (articlesTitle != null && articlesDescription != null && articlesImageUrl!= null) {
             holder.articleTitleTextView.setText(articlesTitle.get(holder.getAdapterPosition()));
             holder.articleDescriptionTextView.setText(articlesDescription.get(holder.getAdapterPosition()));
@@ -68,13 +73,24 @@ public class ArticlesAdapter extends RecyclerView.Adapter<ArticlesAdapter.Articl
                     .with(context)
                     .load(articlesImageUrl.get(holder.getAdapterPosition()))
                     .diskCacheStrategy(DiskCacheStrategy.RESULT)
+                    .centerCrop()
                     .into(holder.articleImageView);
+            holder.articleItem.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    articleListener.onArticleClick(holder.getAdapterPosition());
+                }
+            });
         }
     }
 
     @Override
     public int getItemCount() {
         return articlesImageUrl != null ? articlesImageUrl.size() : 0;
+    }
+
+    public void setListener(ArticleListener articleListener) {
+        this.articleListener = articleListener;
     }
 
     public void setArticlesData(List<String> articlesTitle, List<String> articlesDescription, List<String> articlesImageUrl) {

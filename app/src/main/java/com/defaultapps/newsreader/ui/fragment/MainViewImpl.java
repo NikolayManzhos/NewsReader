@@ -1,5 +1,6 @@
 package com.defaultapps.newsreader.ui.fragment;
 
+import android.content.Context;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -20,10 +21,12 @@ import android.widget.Toast;
 
 import com.defaultapps.newsreader.App;
 import com.defaultapps.newsreader.R;
+import com.defaultapps.newsreader.data.local.sp.SharedPreferencesManager;
 import com.defaultapps.newsreader.ui.adapter.ArticlesAdapter;
 import com.defaultapps.newsreader.ui.presenter.MainViewPresenterImpl;
 import com.squareup.leakcanary.RefWatcher;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -34,15 +37,19 @@ import butterknife.Unbinder;
 import jp.wasabeef.recyclerview.adapters.ScaleInAnimationAdapter;
 
 
-public class MainViewImpl extends Fragment implements MainView, SwipeRefreshLayout.OnRefreshListener {
+public class MainViewImpl extends Fragment implements MainView, ArticlesAdapter.ArticleListener {
 
     private Unbinder unbinder;
+    private MainViewListener mainViewListener;
 
     @Inject
     MainViewPresenterImpl mainViewPresenter;
 
     @Inject
     ArticlesAdapter articlesAdapter;
+
+    @Inject
+    SharedPreferencesManager sharedPreferencesManager;
 
     @BindView(R.id.articlesRecyclerView)
     RecyclerView articlesRecycler;
@@ -55,6 +62,20 @@ public class MainViewImpl extends Fragment implements MainView, SwipeRefreshLayo
 
     @BindView(R.id.errorButton)
     Button errorButton;
+
+    private ArrayList<String> articlesDirectUrl;
+
+
+    public interface MainViewListener {
+        void settingsClicked();
+        void openWebView(String url);
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        mainViewListener = (MainViewListener) context;
+        super.onAttach(context);
+    }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -73,11 +94,24 @@ public class MainViewImpl extends Fragment implements MainView, SwipeRefreshLayo
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         unbinder = ButterKnife.bind(this, view);
         mainViewPresenter.setView(this);
-        swipeRefreshLayout.setOnRefreshListener(this);
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                mainViewPresenter.requestUpdate();
+            }
+        });
         initRecyclerView();
         if (savedInstanceState!= null) {
             mainViewPresenter.restoreViewState();
+        } else if (sharedPreferencesManager.getForceLoadStatus()) {
+            mainViewPresenter.requestUpdate();
+            sharedPreferencesManager.setForceLoadStatus(false);
         }
+        else {
+            mainViewPresenter.requestCache();
+        }
+
+        articlesAdapter.setListener(this);
         super.onViewCreated(view, savedInstanceState);
     }
 
@@ -92,29 +126,31 @@ public class MainViewImpl extends Fragment implements MainView, SwipeRefreshLayo
         switch (item.getItemId()) {
             case R.id.settings:
                 Toast.makeText(getActivity(), "SETTINGS", Toast.LENGTH_SHORT).show();
+                mainViewListener.settingsClicked();
                 break;
         }
         return super.onOptionsItemSelected(item);
     }
 
     @Override
-    public void onRefresh() {
-        mainViewPresenter.requestUpdate();
+    public void onArticleClick(int position) {
+        mainViewListener.openWebView(articlesDirectUrl.get(position));
     }
 
     @Override
-    public void updateView(List<String> articlesTitle, List<String> articlesDescription, List<String> articlesImageUrl) {
+    public void updateView(List<String> articlesTitle, List<String> articlesDescription, List<String> articlesImageUrl, List<String> articlesDirectUrl) {
         articlesAdapter.setArticlesData(articlesTitle, articlesDescription, articlesImageUrl);
+        this.articlesDirectUrl = new ArrayList<>(articlesDirectUrl);
     }
 
     @Override
     public void onDestroyView() {
+        super.onDestroyView();
         articlesRecycler.setAdapter(null);
         mainViewPresenter.detachView();
         unbinder.unbind();
         RefWatcher refWatcher = App.getRefWatcher(getActivity());
         refWatcher.watch(this);
-        super.onDestroyView();
     }
 
     @Override

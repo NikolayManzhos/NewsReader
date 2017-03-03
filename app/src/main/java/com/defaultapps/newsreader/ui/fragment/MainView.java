@@ -10,5 +10,6 @@ public interface MainView extends MvpView {
     void hideArticlesList();
     void updateView(List<String> articlesTitle,
                     List<String> articlesDescription,
-                    List<String> articlesImageUrl);
+                    List<String> articlesImageUrl,
+                    List<String> articlesDirectUrl);
 }
