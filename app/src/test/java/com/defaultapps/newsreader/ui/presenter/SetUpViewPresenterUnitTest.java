@@ -76,7 +76,6 @@ public class SetUpViewPresenterUnitTest {
     @Test
     public void detachViewTest() throws Exception {
         mainViewPresenter.detachView();
-
     }
 
     /**
@@ -108,19 +107,5 @@ public class SetUpViewPresenterUnitTest {
         verify(mainView).hideLoading();
         verify(mainView).hideSourcesList();
     }
-
-    /**
-     * Testing config changes behavior.
-     * If taskRunning == false and errorVisible == false when latest data should be displayed.
-     */
-    @Test
-    public void restoreViewState() {
-        mainViewPresenter.setTaskStatus(false);
-        mainViewPresenter.setErrorVisibilityStatus(false);
-        mainViewPresenter.restoreViewState();
-
-//        verify(mainView).showLoading();
-    }
-
 
 }
