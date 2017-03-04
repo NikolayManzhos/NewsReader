@@ -9,14 +9,17 @@
 
     <item
         android:title="Top"
-        android:id="@+id/updateData"
+        android:id="@+id/sortTop"
+        android:visible="false"
         app:showAsAction="collapseActionView" />
     <item
         android:title="Latest"
         android:id="@+id/sortLatest"
+        android:visible="false"
         app:showAsAction="collapseActionView" />
     <item
         android:title="Popular"
         android:id="@+id/sortPopular"
+        android:visible="false"
         app:showAsAction="collapseActionView" />
 </menu>

@@ -5,6 +5,7 @@ import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.util.ArraySet;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -22,10 +23,13 @@ import com.defaultapps.newsreader.R;
 import com.defaultapps.newsreader.data.local.sp.SharedPreferencesManager;
 import com.defaultapps.newsreader.ui.adapter.SourcesAdapter;
 import com.defaultapps.newsreader.ui.presenter.SetUpViewPresenterImpl;
+import com.google.common.collect.Sets;
 import com.squareup.leakcanary.RefWatcher;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.inject.Inject;
 
@@ -133,6 +137,12 @@ public class SetUpViewImpl extends Fragment implements SetUpView, SourcesAdapter
         refWatcher.watch(this);
     }
 
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        sourcesListener = null;
+    }
+
     @OnClick({R.id.setupEngRadio, R.id.setupDeRadio, R.id.setupFrRadio})
     void onClick(View v) {
         switch (v.getId()) {
@@ -150,8 +160,8 @@ public class SetUpViewImpl extends Fragment implements SetUpView, SourcesAdapter
 
     @Override
     public void onSourceClick(int position) {
-        Toast.makeText(getActivity(), "Position " + String.valueOf(position), Toast.LENGTH_SHORT).show();
         sharedPreferencesManager.setSource(data.get(3).get(position));
+        sharedPreferencesManager.setSortingAvailable(new HashSet<String>(sortsAvailable.get(position)));
         sharedPreferencesManager.setSort("top");
         sourcesListener.sourceClicked();
     }

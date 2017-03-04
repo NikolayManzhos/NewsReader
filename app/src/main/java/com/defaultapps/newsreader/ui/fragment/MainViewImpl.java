@@ -9,6 +9,7 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -27,12 +28,15 @@ import com.defaultapps.newsreader.ui.presenter.MainViewPresenterImpl;
 import com.squareup.leakcanary.RefWatcher;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import butterknife.Unbinder;
 import jp.wasabeef.recyclerview.adapters.ScaleInAnimationAdapter;
 
@@ -64,6 +68,8 @@ public class MainViewImpl extends Fragment implements MainView, ArticlesAdapter.
     Button errorButton;
 
     private ArrayList<String> articlesDirectUrl;
+
+    private final String TAG = "MainViewImpl";
 
 
     public interface MainViewListener {
@@ -101,23 +107,32 @@ public class MainViewImpl extends Fragment implements MainView, ArticlesAdapter.
             }
         });
         initRecyclerView();
-        if (savedInstanceState!= null) {
-            mainViewPresenter.restoreViewState();
-        } else if (sharedPreferencesManager.getForceLoadStatus()) {
+        articlesAdapter.setListener(this);
+        if (sharedPreferencesManager.getForceLoadStatus()) {
             mainViewPresenter.requestUpdate();
             sharedPreferencesManager.setForceLoadStatus(false);
-        }
-        else {
+        }else if (savedInstanceState!= null) {
+            mainViewPresenter.restoreViewState();
+        } else {
             mainViewPresenter.requestCache();
         }
-
-        articlesAdapter.setListener(this);
         super.onViewCreated(view, savedInstanceState);
     }
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.menu_main_view, menu);
+        Set<String> sorting = sharedPreferencesManager.getSortingAvailable();
+        if (sorting.contains("top")) {
+            menu.findItem(R.id.sortTop).setVisible(true);
+        }
+        if (sorting.contains("latest")) {
+            MenuItem latestItem = menu.findItem(R.id.sortLatest);
+            latestItem.setVisible(true);
+        }
+        if(sorting.contains("popular")) {
+            menu.findItem(R.id.sortPopular).setVisible(true);
+        }
         super.onCreateOptionsMenu(menu, inflater);
     }
 
@@ -125,8 +140,22 @@ public class MainViewImpl extends Fragment implements MainView, ArticlesAdapter.
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.settings:
-                Toast.makeText(getActivity(), "SETTINGS", Toast.LENGTH_SHORT).show();
                 mainViewListener.settingsClicked();
+                break;
+            case R.id.sortTop:
+                sharedPreferencesManager.setSort("top");
+                Log.i(TAG, "Top selected");
+                mainViewPresenter.requestUpdate();
+                break;
+            case R.id.sortLatest:
+                sharedPreferencesManager.setSort("latest");
+                mainViewPresenter.requestUpdate();
+                break;
+            case R.id.sortPopular:
+                sharedPreferencesManager.setSort("popular");
+                mainViewPresenter.requestUpdate();
+                break;
+            default:
                 break;
         }
         return super.onOptionsItemSelected(item);
@@ -137,10 +166,16 @@ public class MainViewImpl extends Fragment implements MainView, ArticlesAdapter.
         mainViewListener.openWebView(articlesDirectUrl.get(position));
     }
 
+    @OnClick(R.id.errorButton)
+    void onClick() {
+        mainViewPresenter.requestUpdate();
+    }
+
     @Override
     public void updateView(List<String> articlesTitle, List<String> articlesDescription, List<String> articlesImageUrl, List<String> articlesDirectUrl) {
         articlesAdapter.setArticlesData(articlesTitle, articlesDescription, articlesImageUrl);
         this.articlesDirectUrl = new ArrayList<>(articlesDirectUrl);
+        articlesRecycler.scrollToPosition(0);
     }
 
     @Override
@@ -151,6 +186,12 @@ public class MainViewImpl extends Fragment implements MainView, ArticlesAdapter.
         unbinder.unbind();
         RefWatcher refWatcher = App.getRefWatcher(getActivity());
         refWatcher.watch(this);
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        mainViewListener = null;
     }
 
     @Override

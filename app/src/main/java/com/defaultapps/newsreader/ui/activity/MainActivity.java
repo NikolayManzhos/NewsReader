@@ -37,7 +37,6 @@ public class MainActivity extends AppCompatActivity implements SetUpViewImpl.Sou
                 replaceFragment(new MainViewImpl());
             }
         }
-
     }
 
     @Override
@@ -73,7 +72,7 @@ public class MainActivity extends AppCompatActivity implements SetUpViewImpl.Sou
         String backStateName =  fragment.getClass().getName();
 
         FragmentManager manager = getSupportFragmentManager();
-        boolean fragmentPopped = manager.popBackStackImmediate (backStateName, 0);
+        boolean fragmentPopped = manager.popBackStackImmediate(backStateName, 0);
 
         if (!fragmentPopped && manager.findFragmentByTag(backStateName) == null) {
             FragmentTransaction ft = manager.beginTransaction();
