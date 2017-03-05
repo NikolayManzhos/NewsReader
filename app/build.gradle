@@ -19,6 +19,12 @@ android {
     }
 }
 
+configurations.all {
+    resolutionStrategy {
+        force 'com.android.support:support-annotations:23.1.1'
+    }
+}
+
 repositories {
     maven {url "https://clojars.org/repo/"}
 }
@@ -58,6 +64,5 @@ dependencies {
     //InstrumentalTest
     androidTestCompile "com.android.support.test.espresso:espresso-core:$rootProject.espressoVersion"
     androidTestCompile "org.mockito:mockito-core:$rootProject.mockitoVersion"
-    androidTestCompile "com.android.support:support-annotations:$rootProject.supportAnnotationsVersion"
 
 }

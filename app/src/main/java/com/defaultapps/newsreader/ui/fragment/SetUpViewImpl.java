@@ -158,6 +158,21 @@ public class SetUpViewImpl extends Fragment implements SetUpView, SourcesAdapter
         }
     }
 
+    @OnClick(R.id.errorButton)
+    void onClick() {
+        switch (radioGroup.getCheckedRadioButtonId()) {
+            case R.id.setupEngRadio:
+                setUpViewPresenter.requestSourceUpdate("en");
+                break;
+            case R.id.setupDeRadio:
+                setUpViewPresenter.requestSourceUpdate("de");
+                break;
+            case R.id.setupFrRadio:
+                setUpViewPresenter.requestSourceUpdate("fr");
+                break;
+        }
+    }
+
     @Override
     public void onSourceClick(int position) {
         sharedPreferencesManager.setSource(data.get(3).get(position));

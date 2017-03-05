@@ -26,9 +26,9 @@ task clean(type: Delete) {
 
 ext {
     //generalDependencies
-    appCompatVersion = '25.1.1'
-    supportVersion = '25.1.1'
-    recyclerViewVersion = '25.1.1'
+    appCompatVersion = '25.2.0'
+    supportVersion = '25.2.0'
+    recyclerViewVersion = '25.2.0'
     daggerVersion = '2.9'
     retrofitVersion = '2.1.0'
     butterknifeVersion = '8.5.1'
