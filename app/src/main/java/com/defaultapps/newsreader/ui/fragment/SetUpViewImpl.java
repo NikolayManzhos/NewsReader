@@ -133,8 +133,6 @@ public class SetUpViewImpl extends Fragment implements SetUpView, SourcesAdapter
         setUpViewPresenter.detachView();
         sourcesRecycler.setAdapter(null);
         unbinder.unbind();
-        RefWatcher refWatcher = App.getRefWatcher(getActivity());
-        refWatcher.watch(this);
     }
 
     @Override

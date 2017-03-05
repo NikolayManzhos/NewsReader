@@ -42,7 +42,6 @@ public class MainActivity extends AppCompatActivity implements SetUpViewImpl.Sou
     @Override
     public void sourceClicked() {
         MainViewImpl mainFragment = new MainViewImpl();
-        removeFromBackStack(SetUpViewImpl.class.getName());
         sharedPreferencesManager.setForceLoadStatus(true);
         replaceFragment(mainFragment);
     }
@@ -81,9 +80,5 @@ public class MainActivity extends AppCompatActivity implements SetUpViewImpl.Sou
             ft.addToBackStack(backStateName);
             ft.commit();
         }
-    }
-
-    private void removeFromBackStack(String fragmentName) {
-        getSupportFragmentManager().popBackStack(fragmentName, FragmentManager.POP_BACK_STACK_INCLUSIVE);
     }
 }

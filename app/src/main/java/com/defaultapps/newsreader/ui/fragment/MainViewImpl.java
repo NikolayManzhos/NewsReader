@@ -18,7 +18,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.defaultapps.newsreader.App;
 import com.defaultapps.newsreader.R;
@@ -28,7 +27,6 @@ import com.defaultapps.newsreader.ui.presenter.MainViewPresenterImpl;
 import com.squareup.leakcanary.RefWatcher;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -41,7 +39,7 @@ import butterknife.Unbinder;
 import jp.wasabeef.recyclerview.adapters.ScaleInAnimationAdapter;
 
 
-public class MainViewImpl extends Fragment implements MainView, ArticlesAdapter.ArticleListener {
+public class MainViewImpl extends Fragment implements MainView, ArticlesAdapter.ArticleListener, SwipeRefreshLayout.OnRefreshListener {
 
     private Unbinder unbinder;
     private MainViewListener mainViewListener;
@@ -100,12 +98,7 @@ public class MainViewImpl extends Fragment implements MainView, ArticlesAdapter.
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         unbinder = ButterKnife.bind(this, view);
         mainViewPresenter.setView(this);
-        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                mainViewPresenter.requestUpdate();
-            }
-        });
+        swipeRefreshLayout.setOnRefreshListener(this);
         initRecyclerView();
         articlesAdapter.setListener(this);
         if (sharedPreferencesManager.getForceLoadStatus()) {
@@ -162,6 +155,11 @@ public class MainViewImpl extends Fragment implements MainView, ArticlesAdapter.
     }
 
     @Override
+    public void onRefresh() {
+        mainViewPresenter.requestUpdate();
+    }
+
+    @Override
     public void onArticleClick(int position) {
         mainViewListener.openWebView(articlesDirectUrl.get(position));
     }
@@ -181,11 +179,10 @@ public class MainViewImpl extends Fragment implements MainView, ArticlesAdapter.
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        articlesRecycler.setAdapter(null);
         mainViewPresenter.detachView();
+        articlesRecycler.setAdapter(null);
         unbinder.unbind();
-        RefWatcher refWatcher = App.getRefWatcher(getActivity());
-        refWatcher.watch(this);
+        Log.d(TAG, "View destroyed");
     }
 
     @Override
@@ -231,8 +228,6 @@ public class MainViewImpl extends Fragment implements MainView, ArticlesAdapter.
         articlesRecycler.setLayoutManager(gridLayoutManager);
         ScaleInAnimationAdapter scaleInAnimationAdapter = new ScaleInAnimationAdapter(articlesAdapter);
         scaleInAnimationAdapter.setFirstOnly(false);
-        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(articlesRecycler.getContext(), gridLayoutManager.getOrientation());
-        articlesRecycler.addItemDecoration(dividerItemDecoration);
         articlesRecycler.setAdapter(scaleInAnimationAdapter);
     }
 }

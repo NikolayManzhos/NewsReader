@@ -1,6 +1,10 @@
 package com.defaultapps.newsreader.ui.adapter;
 
+import android.animation.AnimatorInflater;
+import android.animation.StateListAnimator;
 import android.content.Context;
+import android.os.Build;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -35,7 +39,7 @@ public class ArticlesAdapter extends RecyclerView.Adapter<ArticlesAdapter.Articl
     static class ArticleViewHolder extends RecyclerView.ViewHolder {
 
         @BindView(R.id.articleItem)
-        RelativeLayout articleItem;
+        CardView articleItem;
 
         @BindView(R.id.articleTitle)
         TextView articleTitleTextView;
@@ -75,12 +79,19 @@ public class ArticlesAdapter extends RecyclerView.Adapter<ArticlesAdapter.Articl
                     .diskCacheStrategy(DiskCacheStrategy.RESULT)
                     .centerCrop()
                     .into(holder.articleImageView);
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                StateListAnimator stateListAnimator = AnimatorInflater
+                        .loadStateListAnimator(context, R.anim.lift_on_touch);
+                holder.articleItem.setStateListAnimator(stateListAnimator);
+            }
             holder.articleItem.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     articleListener.onArticleClick(holder.getAdapterPosition());
                 }
             });
+
         }
     }
 

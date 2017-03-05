@@ -40,9 +40,7 @@ public class SetUpViewPresenterImpl implements SetUpViewPresenter, SetUpViewInte
 
     @Override
     public void destroy() {
-        //TODO: Stop loading of any data at this point ?
     }
-
 
     @Override
     public void requestSourceUpdate(String languageCode) {

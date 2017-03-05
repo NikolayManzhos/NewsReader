@@ -1,32 +1,46 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/articleItem"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:layout_margin="8dp"
     android:padding="10dp"
-    android:clickable="true"
-    android:background="?android:attr/selectableItemBackground">
+    android:foreground="?android:attr/selectableItemBackground"
+    android:stateListAnimator="@anim/lift_on_touch"
+    app:cardBackgroundColor="#FFFFFF"
+    app:cardElevation="2dp"
+    app:cardCornerRadius="4dp">
 
-    <ImageView
-        android:id="@+id/articleImage"
-        android:layout_width="120dp"
-        android:layout_height="120dp" />
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <ImageView
+            android:id="@+id/articleImage"
+            android:layout_width="match_parent"
+            android:layout_height="140dp"
+            android:layout_centerHorizontal="true"/>
 
-    <TextView
-        android:id="@+id/articleTitle"
-        android:text="@string/place_holder"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_toEndOf="@+id/articleImage"
-        android:layout_marginStart="10dp"/>
+        <TextView
+            android:id="@+id/articleTitle"
+            android:text="@string/place_holder"
+            android:textAppearance="@style/Title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/articleImage"
+            android:layout_marginTop="13dp"
+            android:layout_margin="6dp"/>
 
-    <TextView
-        android:id="@+id/articleDescription"
-        android:text="@string/place_holder"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="15dp"
-        android:layout_below="@+id/articleTitle"
-        android:layout_alignStart="@+id/articleTitle" />
-</RelativeLayout>
+        <TextView
+            android:id="@+id/articleDescription"
+            android:text="@string/place_holder"
+            android:textAppearance="@style/Description"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignStart="@+id/articleTitle"
+            android:layout_below="@+id/articleTitle"
+            android:layout_marginTop="15dp"
+            android:layout_margin="6dp" />
+    </RelativeLayout>
+
+</android.support.v7.widget.CardView>

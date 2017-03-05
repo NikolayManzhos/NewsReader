@@ -64,7 +64,7 @@ public class LocalService {
                 public void run() {
                     file.delete();
                 }
-            }).run();
+            }).start();
         }
     }
 

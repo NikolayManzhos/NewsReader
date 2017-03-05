@@ -1,5 +1,6 @@
 package com.defaultapps.newsreader.ui.presenter;
 import android.support.annotation.VisibleForTesting;
+import android.util.Log;
 
 import com.defaultapps.newsreader.data.interactor.MainViewInteractor;
 import com.defaultapps.newsreader.ui.fragment.MainViewImpl;
@@ -7,8 +8,9 @@ import com.defaultapps.newsreader.ui.fragment.MainViewImpl;
 import java.util.List;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
-
+@Singleton
 public class MainViewPresenterImpl implements MainViewPresenter, MainViewInteractor.MainViewInteractorCallback {
 
     private MainViewInteractor mainViewInteractor;
@@ -20,6 +22,7 @@ public class MainViewPresenterImpl implements MainViewPresenter, MainViewInterac
     @Inject
     public MainViewPresenterImpl(MainViewInteractor mainViewInteractor) {
         this.mainViewInteractor = mainViewInteractor;
+        Log.d("MainViewPresenterImpl", "constructor");
     }
 
     @Override
